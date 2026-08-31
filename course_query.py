@@ -1,6 +1,10 @@
-﻿import requests
-from config import Config
+# course_query.py
+
 import logging
+from pathlib import Path
+
+import requests
+from config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +15,11 @@ def query_selected_course(session, xn=None, xq=None):
 
     logger.info(f'当前session对象的cookies:{session.cookies.get_dict()}')
 
-    # 默认设置为当前学期，在.env中修改
-    xn = Config.XN
-    xq = Config.XQ
+    # 默认设置为当前学期，在.env中修改；也可通过参数覆盖
+    if xn is None:
+        xn = Config.XN
+    if xq is None:
+        xq = Config.XQ
     xnxq = xn.replace('-', '') + xq
 
     # 构建请求负载
@@ -66,7 +72,7 @@ def query_selected_course(session, xn=None, xq=None):
 
     # 更新请求头
     session.headers.update({
-        'Refer': Config.TIS_BASE + '/Xsxk/query/1',
+        'Referer': Config.TIS_BASE + '/Xsxk/query/1',
         'X-Requested-With': 'XMLHttpRequest',
         'RoleCode': '01',
         'Origin': Config.TIS_BASE,
@@ -82,17 +88,21 @@ def query_selected_course(session, xn=None, xq=None):
         resp.raise_for_status()
         data = resp.json()
 
-        if data:
+        # 防御：响应可能不是字典或缺少 yxkcList 字段
+        if isinstance(data, dict) and data.get('yxkcList'):
             courses = data['yxkcList']
             logger.info(f'查询到{len(courses)}门课程')
             return courses
         else:
             logger.info(resp.text)
-            raise Exception(f"未知的相应格式")
+            raise Exception("未知的响应格式")
     except Exception as e:
         logger.error(f'查询过程遇到错误: {e}')
-        with open('resp.txt', 'w', encoding='utg-8') as f:
+        if 'resp' in locals() and resp is not None:
+            # 将响应写入 output/ 目录，便于排查
+            Path(Config.RESP_FILE).parent.mkdir(parents=True, exist_ok=True)
+            with open(Config.RESP_FILE, 'w', encoding='utf-8') as f:
                 f.write(resp.text)
-        if Config.DEBUG:
-            logger.dubug(resp.text[:500])
+            if Config.DEBUG:
+                logger.debug(resp.text[:500])
         raise

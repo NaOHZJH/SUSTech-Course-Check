@@ -1,5 +1,6 @@
-﻿import os
-from re import DEBUG
+# /config.py
+
+import os
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -19,3 +20,16 @@ class Config:
     CAS_LOGIN_URL = "https://cas.sustech.edu.cn/cas/login?service=https%3A%2F%2Ftis.sustech.edu.cn%2Fcas"
     TIS_BASE = "https://tis.sustech.edu.cn"
     QUERY_YXKC_URL = TIS_BASE + "/Xsxk/queryYxkc"
+
+    # ---- 输出文件位置 ----
+    # 所有程序生成的输出文件统一放在 OUTPUT_DIR 下
+    OUTPUT_DIR = os.getenv("OUTPUT_DIR", "output")
+
+    # 课程信息文本输出
+    COURSE_INFO_FILE = os.path.join(OUTPUT_DIR, "course_info.txt")
+
+    # 查询异常时的调试响应
+    RESP_FILE = os.path.join(OUTPUT_DIR, "resp.txt")
+
+    # 课表导出文件路径（显式配置优先）
+    SCHEDULE_FILE = os.getenv("SCHEDULE_FILE") or os.path.join(OUTPUT_DIR, "course_schedule.xlsx")

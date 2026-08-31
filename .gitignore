@@ -1,4 +1,4 @@
-﻿# 环境变量
+# 环境变量
 .env
 
 # Python 缓存
@@ -18,6 +18,12 @@ env/
 
 # 日志文件
 *.log
+
+# 程序输出文件
+output/
+resp.txt
+course_info.txt
+course_schedule.xlsx
 
 # 数据缓存（如有）
 data/

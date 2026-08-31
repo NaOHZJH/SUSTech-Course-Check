@@ -25,6 +25,8 @@
   <ItemGroup>
     <Compile Include="course_info.py" />
     <Compile Include="course_query.py" />
+    <Compile Include="exporter\base.py" />
+    <Compile Include="exporter\EXCEL_exporter.py" />
     <Compile Include="main.py" />
     <Compile Include="CAS_Login.py" />
     <Compile Include="config.py" />
@@ -43,6 +45,9 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include=".env.example" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="exporter\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
