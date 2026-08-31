@@ -41,7 +41,7 @@ CAS_Auto_Login/
 ### 1. 克隆项目并创建虚拟环境
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/NaOHZJH/SUSTech-Course-Check.git
 cd CAS_Auto_Login
 
 # Windows
