@@ -1,4 +1,6 @@
-﻿import requests
+# /CAS_Login.py
+
+import requests
 from bs4 import BeautifulSoup
 from config import Config
 import logging
@@ -10,7 +12,7 @@ def cas_login(username, password):
     模拟CAS登录，返回已认证的requests.Session对象
     """
 
-    logger.debug(f'当前使用的用户名：{Config.USERNAME}, 当前使用的密码：{Config.PASSWORD}')
+    logger.debug(f'当前使用的用户名：{username}')
 
     session = requests.Session()
 
@@ -35,8 +37,8 @@ def cas_login(username, password):
 
         # 构造登陆数据
         login_data = {
-            'username': Config.USERNAME,
-            'password': Config.PASSWORD,
+            'username': username,
+            'password': password,
             'execution': execution_value,
             '_eventId': 'submit',
             }
@@ -53,7 +55,7 @@ def cas_login(username, password):
             logger.info('CAS登录成功')
             return session
         else:
-            raise Exception(f"登录过程异常：{e}")
+            raise Exception(f"登录后未跳转到目标系统，当前地址为：{login_resp.url}，请检查账号密码是否正确")
 
     except Exception as e:
         logger.error(f'登录过程异常：{e}')
