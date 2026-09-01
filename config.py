@@ -33,3 +33,9 @@ class Config:
 
     # 课表导出文件路径（显式配置优先）
     SCHEDULE_FILE = os.getenv("SCHEDULE_FILE") or os.path.join(OUTPUT_DIR, "course_schedule.xlsx")
+
+    # ICS 日历课表导出文件路径（显式配置优先）
+    ICS_FILE = os.getenv("ICS_FILE") or os.path.join(OUTPUT_DIR, "course_schedule.ics")
+
+    # 开学第一周周一日期（格式 YYYY-MM-DD），用于 ICS 课表计算具体日期
+    SEMESTER_START = os.getenv("SEMESTER_START")
