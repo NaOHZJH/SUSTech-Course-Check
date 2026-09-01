@@ -24,6 +24,7 @@ output/
 resp.txt
 course_info.txt
 course_schedule.xlsx
+course_schedule.ics
 
 # 数据缓存（如有）
 data/

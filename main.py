@@ -8,6 +8,7 @@ from CAS_Login import cas_login
 from course_query import query_selected_course
 from course_info import course_info
 from exporter.EXCEL_exporter import ExcelExporter
+from exporter.ICS_exporter import ICSExporter
 
 # 配置日志
 logging.basicConfig(
@@ -27,6 +28,20 @@ def export_schedule(courses):
         logger.info(f"课表已导出：{Config.SCHEDULE_FILE}")
     except Exception as e:
         logger.error(f"课表导出失败：{e}")
+
+def export_ics(courses):
+    """将课程列表导出为 .ics 日历课表，失败不影响主流程"""
+    if not courses:
+        logger.warning("没有课程数据，跳过 ICS 课表导出")
+        return
+    if not Config.SEMESTER_START:
+        logger.warning("未配置 SEMESTER_START（开学第一周周一日期），跳过 ICS 课表导出")
+        return
+    try:
+        ICSExporter(courses, Config.ICS_FILE, Config.SEMESTER_START).export()
+        logger.info(f"ICS 课表已导出：{Config.ICS_FILE}")
+    except Exception as e:
+        logger.error(f"ICS 课表导出失败：{e}")
 
 def main():
     # 登录
@@ -53,6 +68,7 @@ def main():
 
     # 导出课表
     export_schedule(courses)
+    export_ics(courses)
 
 if __name__ == '__main__':
     main()

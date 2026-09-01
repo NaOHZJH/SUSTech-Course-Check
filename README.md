@@ -8,6 +8,7 @@
 - 📚 查询当前学期已选课程(容量 / 已选人数 / 选课系数)
 - 📄 生成课程信息文本 `course_info.txt`
 - 📊 导出课程表 Excel `course_schedule.xlsx`(按星期×节次排版,支持单双周标注、连续节次合并、冻结首行首列)
+- 📅 导出 ICS 日历课表 `course_schedule.ics`(可导入 Google Calendar / Outlook / Apple 日历,支持单双周过滤)
 - 🔧 全部输出统一到 `output/` 目录,可通过 `.env` 自定义
 
 ## 项目结构
@@ -21,13 +22,15 @@ CAS_Auto_Login/
 ├── course_info.py          # 课程信息文本输出
 ├── exporter/               # 导出器
 │   ├── base.py             # 导出器抽象基类 + 时间解析
-│   └── EXCEL_exporter.py   # Excel 课表导出
+│   ├── EXCEL_exporter.py   # Excel 课表导出
+│   └── ICS_exporter.py     # ICS 日历课表导出
 ├── utils.py                # 辅助工具(选课状态分析等)
 ├── requirements.txt        # Python 依赖
 ├── .env.example            # 环境变量模板(复制为 .env 使用)
 └── output/                 # 程序输出目录(自动创建)
     ├── course_info.txt     #   课程信息文本
     ├── course_schedule.xlsx#   课表 Excel
+    ├── course_schedule.ics #   ICS 日历课表
     └── resp.txt            #   查询异常时的调试响应
 ```
 
@@ -42,7 +45,7 @@ CAS_Auto_Login/
 
 ```bash
 git clone https://github.com/NaOHZJH/SUSTech-Course-Check.git
-cd CAS_Auto_Login
+cd SUSTech-Course-Check
 
 # Windows
 python -m venv env
@@ -80,9 +83,18 @@ DEBUG=False
 
 # 课表导出文件路径(可选,默认 output/course_schedule.xlsx)
 # SCHEDULE_FILE=output/course_schedule.xlsx
+
+# ICS 日历课表导出文件路径(可选,默认 output/course_schedule.ics)
+# ICS_FILE=output/course_schedule.ics
+
+# 开学第一周周一日期(格式 YYYY-MM-DD),用于 ICS 课表计算具体上课日期
+# 不配置则跳过 ICS 课表导出
+# SEMESTER_START=2026-09-07
 ```
 
 > ⚠️ `.env` 包含真实凭据,已被 `.gitignore` 忽略,请勿提交到版本库。
+
+> 💡 想用 ICS 课表,必须在 `.env` 中配置 `SEMESTER_START`(开学第一周周一的日期),否则程序会跳过 ICS 导出。节次默认按南科大常见作息(第1节 08:00、每节50分钟)换算,如与实际不符可在 `exporter/ICS_exporter.py` 顶部 `DEFAULT_SECTION_TIMES` 中调整。
 
 ## 使用方法
 
@@ -95,7 +107,7 @@ python main.py
 1. **登录** —— 使用 `.env` 中的账号密码登录 CAS
 2. **查询选课** —— 查询指定学年学期的已选课程
 3. **输出课程信息** —— 逐条打印课程,并写入 `output/course_info.txt`
-4. **导出课表** —— 生成 `output/course_schedule.xlsx`
+4. **导出课表** —— 生成 `output/course_schedule.xlsx` 与 `output/course_schedule.ics`(需配置 `SEMESTER_START`)
 
 ## 输出文件说明
 
@@ -103,6 +115,7 @@ python main.py
 |---|---|
 | `output/course_info.txt` | 课程名称、容量、已选人数、选课系数(每次运行覆盖) |
 | `output/course_schedule.xlsx` | 课程表:行 = 节次,列 = 星期;单元格含课程名、周次、单双周、教室;连续节次自动合并 |
+| `output/course_schedule.ics` | ICS 日历课表:每门课按周次展开为独立事件(单双周自动过滤),可导入 Google Calendar / Outlook / Apple 日历 |
 | `output/resp.txt` | 仅查询异常时写入服务器原始响应,用于排查问题 |
 
 ## 常见问题
@@ -114,7 +127,10 @@ python main.py
 修改 `.env` 中的 `XN`(学年,格式 `2026-2027`)和 `XQ`(学期,`1` 或 `2`)。
 
 **Q: 导出文件能放到别的目录吗?**
-可以,在 `.env` 中设置 `OUTPUT_DIR` 或 `SCHEDULE_FILE`。
+可以,在 `.env` 中设置 `OUTPUT_DIR` 或 `SCHEDULE_FILE` / `ICS_FILE`。
+
+**Q: 为什么没有生成 .ics 文件?**
+ICS 导出需要 `.env` 中的 `SEMESTER_START`(开学第一周周一日期,如 `2026-09-07`),未配置会跳过。另外请确认 `exporter/ICS_exporter.py` 中 `DEFAULT_SECTION_TIMES` 的节次作息与你学校的作息一致。
 
 ## 免责声明
 
